@@ -18,7 +18,6 @@ public class NoBlockDropGlueEntity extends SuperGlueEntity {
     public NoBlockDropGlueEntity(EntityType<?> type, Level level, AABB boundingBox) {
         super(type, level);
         this.setBoundingBox(boundingBox);
-        this.resetPositionToBB(); // centra posición basada en bounding box
     }
 
     public NoBlockDropGlueEntity(EntityType<NoBlockDropGlueEntity> type, Level level) {
@@ -30,56 +29,23 @@ public class NoBlockDropGlueEntity extends SuperGlueEntity {
         super.tick();
     }
 
-    public static boolean isGlued(Level level, BlockPos pos, Direction face) {
-        BlockPos other = pos.relative(face);
-        AABB searchBox = inclusiveBox(pos, other).inflate(0.1); //0.1 default
+    public static boolean isBlockGlued(Level level, BlockPos pos) {
+        // Crear AABB exacto del bloque
+        AABB blockBB = new AABB(pos);
 
-        List<NoBlockDropGlueEntity> glues = level.getEntitiesOfClass(NoBlockDropGlueEntity.class, searchBox);
+        List<NoBlockDropGlueEntity> glues = level.getEntitiesOfClass(NoBlockDropGlueEntity.class, blockBB);
 
         for (NoBlockDropGlueEntity glue : glues) {
-            Set<BlockPos> gluedBlocks = getAllBlocksTouchedByGlue(glue);
+            AABB glueBB = glue.getBoundingBox();
 
-            if (gluedBlocks.contains(pos) && gluedBlocks.contains(other)) {
+            if (glueBB.maxX >= blockBB.minX && glueBB.minX <= blockBB.maxX &&
+                    glueBB.maxY >= blockBB.minY && glueBB.minY <= blockBB.maxY &&
+                    glueBB.maxZ >= blockBB.minZ && glueBB.minZ <= blockBB.maxZ) {
                 return true;
             }
         }
 
         return false;
-    }
-
-    public static AABB inclusiveBox(BlockPos pos1, BlockPos pos2) {
-        int minX = Math.min(pos1.getX(), pos2.getX());
-        int minY = Math.min(pos1.getY(), pos2.getY());
-        int minZ = Math.min(pos1.getZ(), pos2.getZ());
-        int maxX = Math.max(pos1.getX(), pos2.getX());
-        int maxY = Math.max(pos1.getY(), pos2.getY());
-        int maxZ = Math.max(pos1.getZ(), pos2.getZ());
-
-        return new AABB(
-                minX, minY, minZ,
-                maxX + 1, maxY + 1, maxZ + 1 // +1 para incluir el extremo
-        );
-    }
-
-    public static Set<BlockPos> getAllBlocksTouchedByGlue(NoBlockDropGlueEntity glue) {
-        AABB bb = glue.getBoundingBox();
-        BlockPos min = new BlockPos((int) Math.floor(bb.minX), (int) Math.floor(bb.minY), (int) Math.floor(bb.minZ));
-        BlockPos max = new BlockPos((int) Math.floor(bb.maxX), (int) Math.floor(bb.maxY), (int) Math.floor(bb.maxZ));
-
-        Set<BlockPos> touched = new HashSet<>();
-        for (int x = min.getX(); x <= max.getX(); x++) {
-            for (int y = min.getY(); y <= max.getY(); y++) {
-                for (int z = min.getZ(); z <= max.getZ(); z++) {
-                    BlockPos pos = new BlockPos(x, y, z);
-                    AABB blockBox = new AABB(pos);
-                    if (glue.getBoundingBox().intersects(blockBox)) {
-                        touched.add(pos);
-                    }
-                }
-            }
-        }
-
-        return touched;
     }
 }
 

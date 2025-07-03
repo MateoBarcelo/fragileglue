@@ -48,7 +48,6 @@ public class NoBlockDropGlueItem extends Item {
             return InteractionResult.SUCCESS;
         }
 
-        // Segundo clic: pegamos
         BlockPos first = lastClick.pos();
         BlockPos second = currentPos;
 
@@ -57,19 +56,13 @@ public class NoBlockDropGlueItem extends Item {
             return InteractionResult.FAIL;
         }
 
-        /*AABB glueBox = inclusiveBox(lastClick.pos(), context.getClickedPos());
-
-        NoBlockDropGlueEntity glueEntity = new NoBlockDropGlueEntity(
-                ModEntities.CUSTOM_GLUE.get(), level, glueBox
-        );
-
-        level.addFreshEntity(glueEntity);
-        glueEntity.playPlaceSound();*/
-
         for (BlockPos pos : getAllBlocksBetween(context.getClickedPos(), lastClick.pos())) {
+
             AABB bb = new AABB(pos);
+
             NoBlockDropGlueEntity glue = new NoBlockDropGlueEntity(ModEntities.CUSTOM_GLUE.get(), level, bb);
-            glue.setPos(Vec3.atCenterOf(pos));
+            glue.setPos(Vec3.atCenterOf(pos).add(0, -0.5, 0));
+
             level.addFreshEntity(glue);
         }
 
@@ -77,20 +70,6 @@ public class NoBlockDropGlueItem extends Item {
 
         GlueClickTracker.clear(player);
         return InteractionResult.CONSUME;
-    }
-
-    public static AABB inclusiveBox(BlockPos pos1, BlockPos pos2) {
-        int minX = Math.min(pos1.getX(), pos2.getX());
-        int minY = Math.min(pos1.getY(), pos2.getY());
-        int minZ = Math.min(pos1.getZ(), pos2.getZ());
-        int maxX = Math.max(pos1.getX(), pos2.getX());
-        int maxY = Math.max(pos1.getY(), pos2.getY());
-        int maxZ = Math.max(pos1.getZ(), pos2.getZ());
-
-        return new AABB(
-                minX, minY, minZ,
-                maxX + 1, maxY + 1, maxZ + 1 // +1 para incluir el extremo
-        );
     }
 
     public static Iterable<BlockPos> getAllBlocksBetween(BlockPos a, BlockPos b) {

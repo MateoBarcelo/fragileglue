@@ -21,35 +21,21 @@ public class OnBlockBreak {
             Level level = (Level) event.getLevel();
             BlockPos pos = event.getPos();
 
-            System.out.printf("is it %s block %s", NoBlockDropGlueTracker.isGlued(level, pos), pos.toString());
-            for (Direction direction : Direction.values()) {
-                if (NoBlockDropGlueEntity.isGlued(level, pos, direction)) {
-                    // Evitar drops
-                    event.setCanceled(true);
-                    System.out.println("glued!");
-                    // Rompemos el bloque manualmente pero sin drops
-                    BlockState state = level.getBlockState(pos);
+            if (NoBlockDropGlueEntity.isBlockGlued(level, pos)) {
+                event.setCanceled(true); // cancel drop
+                BlockState state = level.getBlockState(pos);
 
-                    level.removeBlock(pos, false); // false = no drops
+                level.removeBlock(pos, false); // false = no drops
 
-                    // Remove glue entities touching this block
-                    for (NoBlockDropGlueEntity glue : level.getEntitiesOfClass(NoBlockDropGlueEntity.class, new AABB(pos).inflate(1.1))) {
-                        if (glue.getBoundingBox().contains(Vec3.atCenterOf(pos))) {
-                            glue.discard();
-
-                            System.out.println("Removed glue entity at " + glue.getBoundingBox());
-                        }
+                // Remove glue entities touching this block
+                for (NoBlockDropGlueEntity glue : level.getEntitiesOfClass(NoBlockDropGlueEntity.class, new AABB(pos).inflate(1.1))) {
+                    if (glue.getBoundingBox().contains(Vec3.atLowerCornerOf(pos))) {
+                        glue.discard();
                     }
-
-                    // Si querés hacer efectos extra
-                    level.levelEvent(2001, pos, Block.getId(state)); // Partículas de rotura
-
-                    // Despegamos el bloque
-                    NoBlockDropGlueTracker.unglue(level, pos);
-                    return;
                 }
-            }
 
+                level.levelEvent(2001, pos, Block.getId(state));
+            }
     }
 
 }
