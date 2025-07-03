@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "me.legadyn.noblockdrop.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "noblockdrop.mixins.refmap.json",
+  "mixins": [
+    "NoBlockDropGlueMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
