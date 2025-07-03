@@ -44,7 +44,7 @@ public class NoBlockDropGlueItem extends Item {
 
         if (lastClick == null) {
             GlueClickTracker.set(player, currentPos, currentFace);
-            player.displayClientMessage(Component.literal("Primer bloque seleccionado"), true);
+            player.displayClientMessage(Component.literal("First block selected"), true);
             return InteractionResult.SUCCESS;
         }
 
@@ -52,7 +52,7 @@ public class NoBlockDropGlueItem extends Item {
         BlockPos second = currentPos;
 
         if (first.equals(second)) {
-            player.displayClientMessage(Component.literal("No se puede pegar el mismo bloque"), true);
+            player.displayClientMessage(Component.literal("Selection canceled"), true);
             return InteractionResult.FAIL;
         }
 
@@ -66,7 +66,7 @@ public class NoBlockDropGlueItem extends Item {
             level.addFreshEntity(glue);
         }
 
-        player.displayClientMessage(Component.literal("¡Bloques pegados!"), true);
+        player.displayClientMessage(Component.literal("Blocks glued"), true);
 
         GlueClickTracker.clear(player);
         return InteractionResult.CONSUME;
