@@ -20,6 +20,12 @@ public class NoBlockDropGlueEntity extends SuperGlueEntity {
         this.setBoundingBox(boundingBox);
     }
 
+    public Direction getAttachmentDirection() {
+        // Implementar según tu lógica
+        return this.getDirection();
+    }
+
+
     public NoBlockDropGlueEntity(EntityType<NoBlockDropGlueEntity> type, Level level) {
         super(type, level);
     }
