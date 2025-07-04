@@ -150,15 +150,13 @@ public class NoBlockDropGlueRenderer extends EntityRenderer<NoBlockDropGlueEntit
         PoseStack.Pose pose = poseStack.last();
         Matrix4f matrix = pose.pose();
 
-        float size = 0.51F; // Ligeramente más grande que el bloque para evitar z-fighting
+        float size = 0.51F;
         float u0 = 0.0F, u1 = 1.0F;
         float v0 = 0.0F, v1 = 1.0F;
-        int alpha = 60; // Transparencia
+        int alpha = 30;
 
-        // Forzar iluminación completa para evitar shading oscuro
-        int fullBrightLight = 0xF000F0; // Luz máxima (15 para ambos valores)
+        int fullBrightLight = 0xF000F0;
 
-        // Cara frontal (Z negativo)
         this.addQuad(vertexConsumer, matrix, pose,
                 -size, -size, -size,  // bottom-left
                 size, -size, -size,   // bottom-right
@@ -166,7 +164,6 @@ public class NoBlockDropGlueRenderer extends EntityRenderer<NoBlockDropGlueEntit
                 -size, size, -size,   // top-left
                 u0, v0, u1, v1, 0, 0, -1, alpha, fullBrightLight);
 
-        // Cara trasera (Z positivo)
         this.addQuad(vertexConsumer, matrix, pose,
                 size, -size, size,    // bottom-left
                 -size, -size, size,   // bottom-right
@@ -174,7 +171,6 @@ public class NoBlockDropGlueRenderer extends EntityRenderer<NoBlockDropGlueEntit
                 size, size, size,     // top-left
                 u0, v0, u1, v1, 0, 0, 1, alpha, fullBrightLight);
 
-        // Cara izquierda (X negativo)
         this.addQuad(vertexConsumer, matrix, pose,
                 -size, -size, size,   // bottom-left
                 -size, -size, -size,  // bottom-right
@@ -182,7 +178,6 @@ public class NoBlockDropGlueRenderer extends EntityRenderer<NoBlockDropGlueEntit
                 -size, size, size,    // top-left
                 u0, v0, u1, v1, -1, 0, 0, alpha, fullBrightLight);
 
-        // Cara derecha (X positivo)
         this.addQuad(vertexConsumer, matrix, pose,
                 size, -size, -size,   // bottom-left
                 size, -size, size,    // bottom-right
@@ -190,7 +185,6 @@ public class NoBlockDropGlueRenderer extends EntityRenderer<NoBlockDropGlueEntit
                 size, size, -size,    // top-left
                 u0, v0, u1, v1, 1, 0, 0, alpha, fullBrightLight);
 
-        // Cara inferior (Y negativo)
         this.addQuad(vertexConsumer, matrix, pose,
                 -size, -size, size,   // bottom-left
                 size, -size, size,    // bottom-right
@@ -198,7 +192,6 @@ public class NoBlockDropGlueRenderer extends EntityRenderer<NoBlockDropGlueEntit
                 -size, -size, -size,  // top-left
                 u0, v0, u1, v1, 0, -1, 0, alpha, fullBrightLight);
 
-        // Cara superior (Y positivo)
         this.addQuad(vertexConsumer, matrix, pose,
                 -size, size, -size,   // bottom-left
                 size, size, -size,    // bottom-right
@@ -216,7 +209,6 @@ public class NoBlockDropGlueRenderer extends EntityRenderer<NoBlockDropGlueEntit
                          float nx, float ny, float nz,
                          int alpha, int packedLight) {
 
-        // Usar color blanco puro y brillante para evitar shading oscuro
         int brightColor = 255;
 
         // Vértice 1
@@ -274,7 +266,6 @@ public class NoBlockDropGlueRenderer extends EntityRenderer<NoBlockDropGlueEntit
         // Color rojo normal
         int red = 220, green = 12, blue = 12, alpha = 130;
 
-        // Renderizar las 12 aristas del cubo
         this.renderCubeOutline(vertexConsumer, pose, minX, maxX, minY, maxY, minZ, maxZ,
                 red, green, blue, alpha, packedLight);
     }
