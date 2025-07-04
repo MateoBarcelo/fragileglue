@@ -27,11 +27,6 @@ public class NoBlockDropGlueEntity extends Entity {
         super(type, level);
     }
 
-    public NoBlockDropGlueEntity(EntityType<?> type, Level level, AABB boundingBox) {
-        super(type, level);
-        this.setBoundingBox(boundingBox);
-    }
-
     public NoBlockDropGlueEntity(EntityType<?> type, Level level, Direction direction, BlockPos pos) {
         this(type, level);
         this.direction = direction;
