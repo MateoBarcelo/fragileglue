@@ -22,7 +22,7 @@ import org.joml.Matrix4f;
 
 public class NoBlockDropGlueRenderer extends EntityRenderer<NoBlockDropGlueEntity> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation("fragileglue", "textures/item/fragile_glue.png");
+    // Ya no necesitamos ResourceLocation para textura personalizada
     private static final float SIZE = 0.5F;
 
     public NoBlockDropGlueRenderer(EntityRendererProvider.Context context) {
@@ -33,16 +33,20 @@ public class NoBlockDropGlueRenderer extends EntityRenderer<NoBlockDropGlueEntit
     public void render(NoBlockDropGlueEntity entity, float entityYaw, float partialTicks,
                        PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
 
+        Player player = Minecraft.getInstance().player;
+        if (player == null) return;
+
+        ItemStack heldItem = player.getMainHandItem();
+        if (!(heldItem.getItem() instanceof NoBlockDropGlueItem)) {
+            return;
+        }
         poseStack.pushPose();
 
-        // Obtener la dirección de la cara donde está pegado el superglue
-        Direction attachmentDirection = entity.getAttachmentDirection();
+        // Posicionar en el centro del bloque
+        poseStack.translate(0.0D, 0.5D, 0.0D);
 
-        // Posicionar y orientar según la cara
-        this.setupPositionAndRotation(poseStack, attachmentDirection);
-
-        // Renderizar el quad del superglue
-        this.renderSuperGlueQuad(poseStack, buffer, packedLight, entity);
+        // Renderizar el borde del bloque
+        this.renderBlockOutline(poseStack, buffer, packedLight, entity);
 
         poseStack.popPose();
 
@@ -50,6 +54,7 @@ public class NoBlockDropGlueRenderer extends EntityRenderer<NoBlockDropGlueEntit
     }
 
     private void setupPositionAndRotation(PoseStack poseStack, Direction direction) {
+        // Ya no necesitamos este método, pero lo dejamos por si lo usas en otro lugar
         poseStack.translate(0.5D, 0.5D, 0.5D);
 
         switch (direction) {
@@ -73,53 +78,79 @@ public class NoBlockDropGlueRenderer extends EntityRenderer<NoBlockDropGlueEntit
                 break;
         }
 
-        poseStack.translate(-0.5D, -0.5D, -0.501D); // Ligeramente hacia afuera para evitar z-fighting
+        poseStack.translate(-0.5D, -0.5D, -0.501D);
     }
 
-    private void renderSuperGlueQuad(PoseStack poseStack, MultiBufferSource buffer,
-                                     int packedLight, NoBlockDropGlueEntity entity) {
+    private void renderBlockOutline(PoseStack poseStack, MultiBufferSource buffer,
+                                    int packedLight, NoBlockDropGlueEntity entity) {
 
-        VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.cutout());
+        // Usar RenderType.lines() para renderizar solo líneas
+        VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.lines());
         PoseStack.Pose pose = poseStack.last();
 
-        // Definir los vértices del quad
-        float minU = 0.0F;
-        float maxU = 1.0F;
-        float minV = 0.0F;
-        float maxV = 1.0F;
+        // Definir los límites del bloque (cubo de 1x1x1 centrado en el origen)
+        float minX = -0.5F;
+        float maxX = 0.5F;
+        float minY = -0.5F;
+        float maxY = 0.5F;
+        float minZ = -0.5F;
+        float maxZ = 0.5F;
 
-        float size = SIZE;
-        float centerX = 0.5F;
-        float centerY = 0.5F;
-        float z = 0.0F;
+        // Grosor de línea y color rojo
+        int red = 255, green = 0, blue = 0, alpha = 255;
 
-        // Calcular posiciones de los vértices
-        float minX = centerX - size;
-        float maxX = centerX + size;
-        float minY = centerY - size;
-        float maxY = centerY + size;
+        // Renderizar las 12 aristas del cubo
 
-        // Renderizar el quad
-        this.addVertex(vertexConsumer, pose, minX, minY, z, minU, maxV, packedLight);
-        this.addVertex(vertexConsumer, pose, minX, maxY, z, minU, minV, packedLight);
-        this.addVertex(vertexConsumer, pose, maxX, maxY, z, maxU, minV, packedLight);
-        this.addVertex(vertexConsumer, pose, maxX, minY, z, maxU, maxV, packedLight);
+        // Aristas inferiores (Y = minY)
+        this.addLine(vertexConsumer, pose, minX, minY, minZ, maxX, minY, minZ, red, green, blue, alpha, packedLight);
+        this.addLine(vertexConsumer, pose, maxX, minY, minZ, maxX, minY, maxZ, red, green, blue, alpha, packedLight);
+        this.addLine(vertexConsumer, pose, maxX, minY, maxZ, minX, minY, maxZ, red, green, blue, alpha, packedLight);
+        this.addLine(vertexConsumer, pose, minX, minY, maxZ, minX, minY, minZ, red, green, blue, alpha, packedLight);
+
+        // Aristas superiores (Y = maxY)
+        this.addLine(vertexConsumer, pose, minX, maxY, minZ, maxX, maxY, minZ, red, green, blue, alpha, packedLight);
+        this.addLine(vertexConsumer, pose, maxX, maxY, minZ, maxX, maxY, maxZ, red, green, blue, alpha, packedLight);
+        this.addLine(vertexConsumer, pose, maxX, maxY, maxZ, minX, maxY, maxZ, red, green, blue, alpha, packedLight);
+        this.addLine(vertexConsumer, pose, minX, maxY, maxZ, minX, maxY, minZ, red, green, blue, alpha, packedLight);
+
+        // Aristas verticales
+        this.addLine(vertexConsumer, pose, minX, minY, minZ, minX, maxY, minZ, red, green, blue, alpha, packedLight);
+        this.addLine(vertexConsumer, pose, maxX, minY, minZ, maxX, maxY, minZ, red, green, blue, alpha, packedLight);
+        this.addLine(vertexConsumer, pose, maxX, minY, maxZ, maxX, maxY, maxZ, red, green, blue, alpha, packedLight);
+        this.addLine(vertexConsumer, pose, minX, minY, maxZ, minX, maxY, maxZ, red, green, blue, alpha, packedLight);
     }
 
-    private void addVertex(VertexConsumer consumer, PoseStack.Pose pose,
-                           float x, float y, float z, float u, float v, int packedLight) {
-        consumer.vertex(pose.pose(), x, y, z)
-                .color(255, 255, 255, 255)
-                .uv(u, v)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(packedLight)
-                .normal(pose.normal(), 0.0F, 0.0F, 1.0F)
+    private void addLine(VertexConsumer consumer, PoseStack.Pose pose,
+                         float x1, float y1, float z1, float x2, float y2, float z2,
+                         int red, int green, int blue, int alpha, int packedLight) {
+
+        // Calcular el vector normal para la línea
+        float dx = x2 - x1;
+        float dy = y2 - y1;
+        float dz = z2 - z1;
+        float length = Mth.sqrt(dx * dx + dy * dy + dz * dz);
+
+        if (length > 0) {
+            dx /= length;
+            dy /= length;
+            dz /= length;
+        }
+
+        // Agregar los dos vértices de la línea
+        consumer.vertex(pose.pose(), x1, y1, z1)
+                .color(red, green, blue, alpha)
+                .normal(pose.normal(), dx, dy, dz)
+                .endVertex();
+
+        consumer.vertex(pose.pose(), x2, y2, z2)
+                .color(red, green, blue, alpha)
+                .normal(pose.normal(), dx, dy, dz)
                 .endVertex();
     }
 
     @Override
     public ResourceLocation getTextureLocation(NoBlockDropGlueEntity entity) {
-        System.out.println(TEXTURE.getPath());
-        return TEXTURE;
+        // Ya no necesitamos textura, pero Minecraft requiere que devolvamos algo
+        return new ResourceLocation("minecraft", "textures/misc/white.png");
     }
 }
