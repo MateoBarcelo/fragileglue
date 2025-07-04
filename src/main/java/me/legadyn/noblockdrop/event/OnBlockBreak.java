@@ -1,10 +1,8 @@
 package me.legadyn.noblockdrop.event;
 
-import me.legadyn.noblockdrop.NoBlockDropGlueTracker;
 import me.legadyn.noblockdrop.Noblockdrop;
 import me.legadyn.noblockdrop.entity.NoBlockDropGlueEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -29,7 +27,7 @@ public class OnBlockBreak {
 
                 // Remove glue entities touching this block
                 for (NoBlockDropGlueEntity glue : level.getEntitiesOfClass(NoBlockDropGlueEntity.class, new AABB(pos).inflate(1.1))) {
-                    if (glue.getBoundingBox().contains(Vec3.atLowerCornerOf(pos))) {
+                    if (glue.getBoundingBox().intersects(new AABB(pos))) {
                         glue.discard();
                     }
                 }

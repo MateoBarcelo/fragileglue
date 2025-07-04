@@ -1,7 +1,6 @@
 package me.legadyn.noblockdrop;
 
 import com.mojang.logging.LogUtils;
-import com.simibubi.create.content.contraptions.glue.SuperGlueRenderer;
 import me.legadyn.noblockdrop.entity.ModEntities;
 import me.legadyn.noblockdrop.event.OnBlockBreak;
 import me.legadyn.noblockdrop.item.ModItems;

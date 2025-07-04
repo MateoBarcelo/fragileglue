@@ -1,10 +1,7 @@
 package me.legadyn.noblockdrop.item;
 
-import com.simibubi.create.content.contraptions.glue.SuperGlueItem;
-import jdk.swing.interop.SwingInterOpUtils;
 import me.legadyn.noblockdrop.GlueClick;
 import me.legadyn.noblockdrop.GlueClickTracker;
-import me.legadyn.noblockdrop.NoBlockDropGlueTracker;
 import me.legadyn.noblockdrop.entity.ModEntities;
 import me.legadyn.noblockdrop.entity.NoBlockDropGlueEntity;
 import net.minecraft.core.BlockPos;
@@ -16,8 +13,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
@@ -58,9 +53,8 @@ public class NoBlockDropGlueItem extends Item {
 
         for (BlockPos pos : getAllBlocksBetween(context.getClickedPos(), lastClick.pos())) {
 
-            AABB bb = new AABB(pos);
 
-            NoBlockDropGlueEntity glue = new NoBlockDropGlueEntity(ModEntities.CUSTOM_GLUE.get(), level, bb);
+            NoBlockDropGlueEntity glue = new NoBlockDropGlueEntity(ModEntities.CUSTOM_GLUE.get(), level);
             glue.setPos(Vec3.atCenterOf(pos).add(0, -0.5, 0));
 
             level.addFreshEntity(glue);
