@@ -14,7 +14,7 @@ public class ModEntities {
     public static final RegistryObject<EntityType<NoBlockDropGlueEntity>> CUSTOM_GLUE =
             ENTITIES.register("fragile_glue", () ->
                     EntityType.Builder.<NoBlockDropGlueEntity>of(NoBlockDropGlueEntity::new, MobCategory.MISC)
-                            .sized(1.05f, 1.05f)            .clientTrackingRange(10)
+                            .sized(0.5f, 0.5f)            .clientTrackingRange(10)
                             .updateInterval(20)
                             .build("fragile_glue")
             );
