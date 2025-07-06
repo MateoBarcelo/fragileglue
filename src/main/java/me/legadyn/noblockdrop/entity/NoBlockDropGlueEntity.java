@@ -9,9 +9,12 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -85,7 +88,7 @@ public class NoBlockDropGlueEntity extends Entity {
         List<NoBlockDropGlueEntity> glues = level.getEntitiesOfClass(NoBlockDropGlueEntity.class, box);
 
         for (NoBlockDropGlueEntity glue : glues) {
-            if (glue.getBoundingBox().intersects(box.deflate(0.05f))) {
+            if (glue.getBoundingBox().intersects(box)) {
                 return true;
             }
         }
@@ -107,12 +110,29 @@ public class NoBlockDropGlueEntity extends Entity {
     }
 
     @Override
+    public boolean isInvulnerableTo(DamageSource damageSource) {
+        // Inmune a explosiones
+        if (damageSource.is(DamageTypes.EXPLOSION) ||
+                damageSource.is(DamageTypes.PLAYER_EXPLOSION)) {
+            return true;
+        }
+
+        return super.isInvulnerableTo(damageSource);
+    }
+    @Override
+    public boolean isInvulnerable() {
+        return true;
+    }
+
+    @Override
     public boolean hurt(DamageSource source, float amount) {
         if (!this.level().isClientSide) {
             if (source.getEntity() instanceof Player player) {
                 if (player.getMainHandItem().getItem() instanceof NoBlockDropGlueItem) {
                     this.discard();
-                    return true; // Ya manejamos el daño
+                    return true;
+                } else {
+                    return false;
                 }
             }
         }

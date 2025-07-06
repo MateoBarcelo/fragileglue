@@ -9,8 +9,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.ExplosionEvent;
+import net.minecraftforge.event.level.PistonEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Mod.EventBusSubscriber(modid = Noblockdrop.MOD_ID)
 public class OnBlockBreak {
@@ -34,6 +39,29 @@ public class OnBlockBreak {
 
                 level.levelEvent(2001, pos, Block.getId(state));
             }
+    }
+
+    @SubscribeEvent
+    public static void onExplosionDetonate(ExplosionEvent.Detonate event) {
+        List<BlockPos> toRemove = new ArrayList<>();
+
+        for (BlockPos pos : event.getAffectedBlocks()) {
+            if (NoBlockDropGlueEntity.isBlockGlued(event.getLevel(), pos)) {
+                //toRemove.add(pos);
+            }
+        }
+        // Evita que esos bloques dropeen
+        event.getAffectedBlocks().removeAll(toRemove);
+    }
+
+    @SubscribeEvent
+    public static void onPistonPush(PistonEvent.Pre event) {
+        for (BlockPos pos : event.getStructureHelper().getToPush()) {
+            if (NoBlockDropGlueEntity.isBlockGlued((Level) event.getLevel(), pos)) {
+                event.setCanceled(true);
+                return;
+            }
+        }
     }
 
 }
