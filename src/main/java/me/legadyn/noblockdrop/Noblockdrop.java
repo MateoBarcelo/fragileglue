@@ -2,13 +2,24 @@ package me.legadyn.noblockdrop;
 
 import com.mojang.logging.LogUtils;
 import me.legadyn.noblockdrop.entity.ModEntities;
+import me.legadyn.noblockdrop.entity.NoBlockDropGlueEntity;
 import me.legadyn.noblockdrop.event.OnBlockBreak;
 import me.legadyn.noblockdrop.item.ModItems;
+import me.legadyn.noblockdrop.item.NoBlockDropGlueItem;
+import me.legadyn.noblockdrop.network.C2SRemoveGluePacket;
+import me.legadyn.noblockdrop.network.ModNetworking;
 import me.legadyn.noblockdrop.renderer.NoBlockDropGlueRenderer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -33,6 +44,7 @@ public class Noblockdrop {
         MinecraftForge.EVENT_BUS.register(this);
         ModEntities.register(modEventBus);
         ModItems.register(modEventBus);
+        ModNetworking.register();
         modEventBus.register(new OnBlockBreak());
         modEventBus.addListener(this::addCreative);
     }
@@ -65,5 +77,34 @@ public class Noblockdrop {
             System.out.println("RENDERER EVENT");
             event.registerEntityRenderer(ModEntities.CUSTOM_GLUE.get(), NoBlockDropGlueRenderer::new);
         }
+
+        @Mod.EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT)
+        public class ClientEvents {
+
+            @SubscribeEvent
+            public static void onClientTick(TickEvent.ClientTickEvent event) {
+                Minecraft mc = Minecraft.getInstance();
+
+                if (mc.level == null || mc.player == null || mc.screen != null) return;
+
+                // Solo si tiene el ítem en la mano
+                if (!(mc.player.getMainHandItem().getItem() instanceof NoBlockDropGlueItem)) return;
+
+                // Detectar click izquierdo
+                if (mc.options.keyAttack.isDown()) {
+                    if (mc.hitResult instanceof BlockHitResult bhr) {
+                        BlockPos pos = bhr.getBlockPos();
+                        Direction face = bhr.getDirection();
+                        System.out.println("asd");
+
+                        if (NoBlockDropGlueEntity.isBlockGlued(mc.level, pos)) {
+                            System.out.println("glued");
+                            ModNetworking.INSTANCE.sendToServer(new C2SRemoveGluePacket(pos, face));
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }
