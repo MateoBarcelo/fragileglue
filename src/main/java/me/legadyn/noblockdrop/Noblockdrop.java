@@ -74,7 +74,6 @@ public class Noblockdrop {
 
         @SubscribeEvent
         public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
-            System.out.println("RENDERER EVENT");
             event.registerEntityRenderer(ModEntities.CUSTOM_GLUE.get(), NoBlockDropGlueRenderer::new);
         }
 
@@ -95,10 +94,8 @@ public class Noblockdrop {
                     if (mc.hitResult instanceof BlockHitResult bhr) {
                         BlockPos pos = bhr.getBlockPos();
                         Direction face = bhr.getDirection();
-                        System.out.println("asd");
 
                         if (NoBlockDropGlueEntity.isBlockGlued(mc.level, pos)) {
-                            System.out.println("glued");
                             ModNetworking.INSTANCE.sendToServer(new C2SRemoveGluePacket(pos, face));
                         }
                     }
