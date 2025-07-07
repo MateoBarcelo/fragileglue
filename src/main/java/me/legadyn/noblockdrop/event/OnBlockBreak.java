@@ -2,7 +2,9 @@ package me.legadyn.noblockdrop.event;
 
 import me.legadyn.noblockdrop.Noblockdrop;
 import me.legadyn.noblockdrop.entity.NoBlockDropGlueEntity;
+import me.legadyn.noblockdrop.item.NoBlockDropGlueItem;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -23,6 +25,11 @@ public class OnBlockBreak {
         public static void onBlockBreak(BlockEvent.BreakEvent event) {
             Level level = (Level) event.getLevel();
             BlockPos pos = event.getPos();
+
+            if(event.getPlayer().getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof NoBlockDropGlueItem) {
+                event.setCanceled(true);
+                return;
+            }
 
             if (NoBlockDropGlueEntity.isBlockGlued(level, pos)) {
                 event.setCanceled(true); // cancel drop
@@ -47,7 +54,7 @@ public class OnBlockBreak {
 
         for (BlockPos pos : event.getAffectedBlocks()) {
             if (NoBlockDropGlueEntity.isBlockGlued(event.getLevel(), pos)) {
-                //toRemove.add(pos);
+                toRemove.add(pos);
             }
         }
         // Evita que esos bloques dropeen
