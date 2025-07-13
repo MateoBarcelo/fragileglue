@@ -1,6 +1,5 @@
 package me.legadyn.noblockdrop.mixin;
 
-import com.simibubi.create.content.contraptions.glue.SuperGlueEntity;
 import me.legadyn.noblockdrop.entity.NoBlockDropGlueEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
